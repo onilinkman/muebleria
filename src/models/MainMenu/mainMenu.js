@@ -26,11 +26,11 @@ class MainMenu extends React.Component {
 					/>
 					<p>REGISTRO DEL PERSONAL</p>
 				</Link>
-				<Link className="btn-to-modal" to="/">
+				<Link className="btn-to-modal" to="/manageStaff">
 					<img alt="manage_accounts" src={manage_accounts} />
 					<p>CONTROL DEL PERSONAL</p>
 				</Link>
-				<Link className="btn-to-modal" to="/">
+				<Link className="btn-to-modal" to="/ShopMenu">
 					<img alt="point_of_sale" src={point_of_sale} />
 					<p>VENTA POR MENOR</p>
 				</Link>
@@ -38,7 +38,7 @@ class MainMenu extends React.Component {
 					<img alt='"group_add' src={group_add} />
 					<p>AGREGAR CLIENTES</p>
 				</Link>
-				<Link className="btn-to-modal" to="/">
+				<Link className="btn-to-modal" to="/MenuInventory">
 					<img alt="inventory" src={inventory} />
 					<p>INVENTARIO Y GASTOS</p>
 				</Link>

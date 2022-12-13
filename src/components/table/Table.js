@@ -1,192 +1,214 @@
-import React from "react";
+import React from 'react';
 
 class TableLibrary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.maxRows = 10;
+	constructor(props) {
+		super(props);
+		this.maxRows =
+			this.props.maxRows === undefined ? 10 : this.props.maxRows;
 
-    this.numberOfObjects = this.countNumeberOfPages();
-    this.pageActual = 1;
-    this.pointer = 1;
-    this.idName =
-      this.props.idName === undefined ? "tableDefault" : this.props.idName;
-    this.className =
-      this.props.className === undefined
-        ? "table table-striped table-bordered"
-        : this.props.className;
-  }
+		this.numberOfObjects = this.countNumeberOfPages();
+		this.pageActual = 1;
+		this.pointer = 1;
+		this.idName =
+			this.props.idName === undefined
+				? 'tableDefault'
+				: this.props.idName;
+		this.className =
+			this.props.className === undefined
+				? 'table table-striped table-bordered'
+				: this.props.className;
 
-  CreateTable() {
-    if (this.props.data.length > 0) {
-      var dataKeys = Object.keys(this.props.data[0]);
-      return (
-        <table className={this.className} id={this.idName}>
-          <thead>
-            {this.CreateTableHeader(
-              this.limitedRows(this.props.data),
-              dataKeys
-            )}
-          </thead>
-          <tbody>
-            {this.CreateBody(this.limitedRows(this.props.data), dataKeys)}
-          </tbody>
-        </table>
-      );
-    }
-  }
+		this.onClickTr = typeof(props.onClickTr)==='function' ? props.onClickTr:()=>{console.warn("need a function for onClickTr")};
+	}
 
-  /**
-   * Crea la cabecera de las tablas en base a los datos que se le pasan
-   * @param {*} data
-   */
-  CreateTableHeader(data, dataKeys) {
-    if (typeof data === "object") {
-      var newTh = dataKeys.map((key) => {
-        if (!this.props.skipHeader?.has(key)) {
-          return <th key={key}>{key}</th>;
-        }
-      });
-      return (
-        <tr>
-          {this.AddHeaderExtra(this.props.headerExtraBefore)}
-          {newTh}
-          {this.AddHeaderExtra(this.props.headerExtraAfter)}
-        </tr>
-      );
-    }
-  }
-  /**
-   * adiciona la cabecera extra en la tabla
-   * @param {objeto a adicionar a la cabecera} data
-   * @returns
-   */
-  AddHeaderExtra(data) {
-    if (typeof data === "object") {
-      var newTh = data.map((obj) => {
-        let key = Object.keys(obj)[0];
-        return <th key={key}>{key}</th>;
-      });
-      return newTh;
-    }
-  }
+	CreateTable() {
+		if (this.props.data.length > 0) {
+			var dataKeys = Object.keys(this.props.data[0]);
+			return (
+				<table className={this.className} id={this.idName}>
+					<thead>
+						{this.CreateTableHeader(
+							this.limitedRows(this.props.data),
+							dataKeys
+						)}
+					</thead>
+					<tbody>
+						{this.CreateBody(
+							this.limitedRows(this.props.data),
+							dataKeys
+						)}
+					</tbody>
+				</table>
+			);
+		}
+	}
 
-  countNumeberOfPages() {
-    return Math.ceil(this.props.data.length / this.maxRows);
-  }
+	/**
+	 * Crea la cabecera de las tablas en base a los datos que se le pasan
+	 * @param {*} data
+	 */
+	CreateTableHeader(data, dataKeys) {
+		if (typeof data === 'object') {
+			var newTh = dataKeys.map((key) => {
+				if (!this.props.skipHeader?.has(key)) {
+					return <th key={key}>{key}</th>;
+				}
+			});
+			return (
+				<tr>
+					{this.AddHeaderExtra(this.props.headerExtraBefore)}
+					{newTh}
+					{this.AddHeaderExtra(this.props.headerExtraAfter)}
+				</tr>
+			);
+		}
+	}
+	/**
+	 * adiciona la cabecera extra en la tabla
+	 * @param {objeto a adicionar a la cabecera} data
+	 * @returns
+	 */
+	AddHeaderExtra(data) {
+		if (typeof data === 'object') {
+			var newTh = data.map((obj) => {
+				let key = Object.keys(obj)[0];
+				return <th key={key}>{key}</th>;
+			});
+			return newTh;
+		}
+	}
 
-  limitedRows(data) {
-    var newData = [];
-    var start = this.pointer * this.maxRows - this.maxRows;
-    var end = this.pointer * this.maxRows;
-    for (var i = start; i < end; i++) {
-      if (data[i] !== undefined) {
-        newData.push(data[i]);
-      }
-    }
-    return newData;
-  }
+	countNumeberOfPages() {
+		return Math.ceil(this.props.data.length / this.maxRows);
+	}
 
-  /**
-   * A partir de un objeto JSON se crea el contenido de la tabla,
-   * tambien adiciona las columnas extras que vienen departe de
-   * HeaderExtraBefore y HeaderExtraAfter antes y despues del contenido
-   * original respectivamente
-   * @param {json a mostrar} data
-   * @param {claves json a mostrar} dataKeys
-   * @returns
-   */
-  CreateBody(data, dataKeys) {
-    var newTrs = data.map((obj, i) => {
-      return (
-        <tr key={i}>
-          {this.addRowExtraAction(obj, i, this.props.headerExtraBefore)}
-          {this.AddRow(i, data, dataKeys)}
-          {this.addRowExtraAction(obj, i, this.props.headerExtraAfter)}
-        </tr>
-      );
-    });
-    return newTrs;
-  }
+	limitedRows(data) {
+		var newData = [];
+		var start = this.pointer * this.maxRows - this.maxRows;
+		var end = this.pointer * this.maxRows;
+		for (var i = start; i < end; i++) {
+			if (data[i] !== undefined) {
+				newData.push(data[i]);
+			}
+		}
+		return newData;
+	}
 
-  /**
-   * Crea una columna extra
-   * @param {json a adicionar} data
-   * @param {nro de fila actual} row
-   * @param {*} dataMap
-   * @returns
-   */
-  addRowExtraAction(data, row, dataMap) {
-    return dataMap?.map((key) => {
-      let keyName = Object.keys(key)[0];
-      return <td key={keyName}>{key[keyName](data, row)}</td>;
-    });
-  }
+	/**
+	 * A partir de un objeto JSON se crea el contenido de la tabla,
+	 * tambien adiciona las columnas extras que vienen departe de
+	 * HeaderExtraBefore y HeaderExtraAfter antes y despues del contenido
+	 * original respectivamente
+	 * @param {json a mostrar} data
+	 * @param {claves json a mostrar} dataKeys
+	 * @returns
+	 */
+	CreateBody(data, dataKeys) {
+		var newTrs = data.map((obj, i) => {
+			return (
+				<tr key={i} onClick={() => {this.onClickTr(obj,i)}}>
+					{this.addRowExtraAction(
+						obj,
+						i,
+						this.props.headerExtraBefore
+					)}
+					{this.AddRow(i, data, dataKeys)}
+					{this.addRowExtraAction(
+						obj,
+						i,
+						this.props.headerExtraAfter
+					)}
+				</tr>
+			);
+		});
+		return newTrs;
+	}
 
-  AddRow(row, data, dataKeys) {
-    var newTd = dataKeys?.map((key) => {
-      if (!this.props.skipHeader?.has(key)) {
-        return <td key={key}>{data[row][key]}</td>;
-      }
-    });
+	/**
+	 * Crea una columna extra
+	 * @param {json a adicionar} data
+	 * @param {nro de fila actual} row
+	 * @param {*} dataMap
+	 * @returns
+	 */
+	addRowExtraAction(data, row, dataMap) {
+		return dataMap?.map((key) => {
+			let keyName = Object.keys(key)[0];
+			return <td key={keyName}>{key[keyName](data, row)}</td>;
+		});
+	}
 
-    return newTd;
-  }
+	AddRow(row, data, dataKeys) {
+		var newTd = dataKeys?.map((key) => {
+			if (!this.props.skipHeader?.has(key)) {
+				return <td key={key}>{data[row][key]}</td>;
+			}
+		});
 
-  shouldComponentUpdate(nextProps) {
-    return true;
-  }
+		return newTd;
+	}
 
-  CreatePaginator(actualPage, totalPages) {
-    let onclick = () => {
-      this.render();
-      this.setState({});
-      this.pointer = actualPage;
-    };
-    let styleSelected = {
-      selected: { background: "red" },
-      unselected: { background: "white" },
-    };
-    let button = (
-      <button
-        onClick={onclick}
-        key={actualPage}
-        style={
-          this.pointer === actualPage
-            ? styleSelected.selected
-            : styleSelected.unselected
-        }
-      >
-        {actualPage}
-      </button>
-    );
-    if (actualPage < totalPages) {
-      if (actualPage < this.pointer + 2 || actualPage === totalPages - 1) {
-        return [button, this.CreatePaginator(actualPage + 1, totalPages)];
-      } else if (actualPage === this.pointer + 2) {
-        return [
-          <h3 key={actualPage}>....</h3>,
-          this.CreatePaginator(actualPage + 1, totalPages),
-        ];
-      } else {
-        return this.CreatePaginator(actualPage + 1, totalPages);
-      }
-    }
-    return button;
-  }
+	shouldComponentUpdate(nextProps) {
+		return true;
+	}
 
-  render() {
-    return (
-      <div className={this.props.className + "-container"}>
-        {this.CreateTable()}
-        <div style={{ display: "flex" }}>
-          {this.CreatePaginator(
-            this.pointer > 2 ? this.pointer - 2 : 1,
-            this.numberOfObjects
-          )}
-        </div>
-      </div>
-    );
-  }
+	CreatePaginator(actualPage, totalPages) {
+		let onclick = () => {
+			this.render();
+			this.setState({});
+			this.pointer = actualPage;
+		};
+		let styleSelected = {
+			selected: { background: 'red' },
+			unselected: { background: 'white' },
+		};
+		let button = (
+			<button
+				onClick={onclick}
+				key={actualPage}
+				style={
+					this.pointer === actualPage
+						? styleSelected.selected
+						: styleSelected.unselected
+				}
+			>
+				{actualPage}
+			</button>
+		);
+		if (actualPage < totalPages) {
+			if (
+				actualPage < this.pointer + 2 ||
+				actualPage === totalPages - 1
+			) {
+				return [
+					button,
+					this.CreatePaginator(actualPage + 1, totalPages),
+				];
+			} else if (actualPage === this.pointer + 2) {
+				return [
+					<h3 key={actualPage}>....</h3>,
+					this.CreatePaginator(actualPage + 1, totalPages),
+				];
+			} else {
+				return this.CreatePaginator(actualPage + 1, totalPages);
+			}
+		}
+		return button;
+	}
+
+	render() {
+		return (
+			<div className={this.props.className + '-container'}>
+				{this.CreateTable()}
+				<div style={{ display: 'flex' }}>
+					{this.CreatePaginator(
+						this.pointer > 2 ? this.pointer - 2 : 1,
+						this.numberOfObjects
+					)}
+				</div>
+			</div>
+		);
+	}
 }
 
 export default TableLibrary;

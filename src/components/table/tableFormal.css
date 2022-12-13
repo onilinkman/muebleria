@@ -1,0 +1,53 @@
+.table-content {
+	display: flex;
+	justify-content: center;
+	padding: 15px;
+}
+
+.library-table-container{
+    overflow-x: auto;
+}
+
+.library-table {
+    
+	font-family: monospace;
+	font-style: revert;
+	font-size: 1.2em;
+	border: 2px solid grey;
+	/* height: 100%; */
+	/* margin-left: 15px; */
+	border-collapse: collapse;
+	background: #ffffffb0;
+	color: #020202;
+}
+
+
+
+.library-table thead {
+	background: linear-gradient(red, #ff000033);
+}
+
+.library-table tbody tr {
+    min-height: 40px;
+    border-bottom: solid;
+    border-width: 0px;
+    border-color: #0000005c;
+    border-style: dashed;
+    cursor: pointer;
+}
+
+.library-table tbody tr:hover {
+    background: #dddddd;
+}
+
+.library-table tbody tr:active {
+    background: white;
+}
+
+.library-table tbody tr td {
+    border-left: solid;
+    border-width: 2px;
+    border-color: #0000005c;
+    border-style: inset;
+    overflow-x: auto;
+}

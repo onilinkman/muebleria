@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 
 import ComboBox from '../../../components/ComboBox/ComboBox';
+import BtnImg from '../../../components/BtnImg/BtnImg';
 
-import add_photo from '../../../assets/icons/add_a_photo.svg';
+
 import person_add from '../../../assets/icons/person_add_black_24dp.svg';
 import edit_48 from '../../../assets/icons/edit_48.svg';
 import check_48 from '../../../assets/icons/check_48.svg';
@@ -13,42 +14,59 @@ export default function Panel(props) {
 	const [styleBtnsOptions, setStyleBtnsOptions] = useState({
 		display: 'flex',
 	});
+	const [styleBtnsActions, setStyleBtnsActions] = useState({
+		display: 'none',
+	});
+	const [styleBtnsEdit, setStyleBtnsEdit] = useState({
+		display: 'none',
+	});
 
 	//Buttons ref
 	const inputName = useRef(null);
 	const inputFirstName = useRef(null);
 	const inputCi = useRef(null);
 
-	const imgPreview = useRef(null);
+	
 	const btnsOptions = useRef(null);
+	const actionRegister = useRef(null);
+	const btnImage=useRef(null)
+	
 
-	const selectImage = () => {
-		document.getElementById('capture-img').click();
-	};
-	var file;
-	const onSelectImg = (e) => {
-		file = e.target.files[0];
-		if (file) {
-			let reader = new FileReader();
-			reader.onload = () => {
-				imgPreview.current.src = reader.result;
-			};
-			reader.readAsDataURL(file);
-		}
-	};
-
-	const enableDisabledInputs = () => {
-		setIsDisabled(!isDisabled);
+	const enableInputs = () => {
+		setIsDisabled(false);
 		setStyleBtnsOptions({ display: 'none' });
+		setStyleBtnsActions({ display: 'flex' });
 	};
 
 	const clearInputs = () => {
 		inputName.current.value = '';
 		inputFirstName.current.value = '';
 		inputCi.current.value = '';
-		imgPreview.current.src = add_photo;
-		file = null;
+		btnImage.current.RestaurePhoto();
 	};
+
+	const hiddenBtnsAction = () => {
+		setIsDisabled(true);
+		setStyleBtnsActions({ display: 'none' });
+		setStyleBtnsEdit({ display: 'none' });
+		setStyleBtnsOptions({ display: 'flex' });
+		clearInputs();
+	};
+
+	const enableEdit = () => {
+		setIsDisabled(false);
+		setStyleBtnsOptions({ display: 'none' });
+		setStyleBtnsEdit({ display: 'flex' });
+		clearInputs();
+	};
+
+	const ConfirmEdit = () => {
+		setIsDisabled(true);
+		setStyleBtnsEdit({ display: 'none' });
+		setStyleBtnsOptions({ display: 'flex' });
+		clearInputs();
+	};
+
 
 	return (
 		<div className="body-panel">
@@ -62,6 +80,7 @@ export default function Panel(props) {
 							placeholder="Ingrese Nombres"
 							ref={inputName}
 							disabled={isDisabled}
+							autoComplete="off"
 						/>
 					</div>
 					<div className="panel-input">
@@ -72,6 +91,7 @@ export default function Panel(props) {
 							placeholder="Ingrese Apellido Paterno y Materno"
 							ref={inputFirstName}
 							disabled={isDisabled}
+							autoComplete="off"
 						/>
 					</div>
 					<div className="panel-input">
@@ -82,6 +102,7 @@ export default function Panel(props) {
 							placeholder="Ingrese CI"
 							ref={inputCi}
 							disabled={isDisabled}
+							autoComplete="off"
 						/>
 					</div>
 					<div className="panel-input">
@@ -90,6 +111,7 @@ export default function Panel(props) {
 							type="date"
 							id="date-panel"
 							disabled={isDisabled}
+							autoComplete="off"
 						/>
 					</div>
 					<div className="panel-input">
@@ -100,21 +122,8 @@ export default function Panel(props) {
 						/>
 					</div>
 				</div>
-				<div className="image-panel" onClick={selectImage}>
-					<img
-						value="add_photo"
-						src={add_photo}
-						id="preview-img"
-						ref={imgPreview}
-					></img>
-				</div>
-				<input
-					id="capture-img"
-					type="file"
-					accept="image/*;capture=camera"
-					src={add_photo}
-					onChange={onSelectImg}
-				/>
+				<BtnImg ref={btnImage}/>
+				
 			</div>
 			<div className="btn-panel">
 				<div
@@ -124,7 +133,7 @@ export default function Panel(props) {
 				>
 					<button
 						className="btn-confirm btns-action-efect"
-						onClick={enableDisabledInputs}
+						onClick={enableInputs}
 					>
 						<img
 							className="icon_personal"
@@ -133,7 +142,10 @@ export default function Panel(props) {
 						></img>
 						Registrar
 					</button>
-					<button className="edit-personal btns-action-efect" onClick={clearInputs}>
+					<button
+						className="edit-personal btns-action-efect"
+						onClick={enableEdit}
+					>
 						<img
 							className="icon_personal"
 							alt="edit_person"
@@ -142,8 +154,15 @@ export default function Panel(props) {
 						Editar
 					</button>
 				</div>
-				<div className="btns-action-register">
-					<button className="btn-confirm btns-action-efect">
+				<div
+					className="btns-action-register"
+					ref={actionRegister}
+					style={styleBtnsActions}
+				>
+					<button
+						className="btn-confirm btns-action-efect"
+						onClick={hiddenBtnsAction}
+					>
 						<img
 							className="icon_check"
 							alt="check"
@@ -151,7 +170,34 @@ export default function Panel(props) {
 						></img>
 						CONFIRMAR REGISTRO
 					</button>
-					<button className="btn-cancel btns-action-efect">
+					<button
+						className="btn-cancel btns-action-efect"
+						onClick={hiddenBtnsAction}
+					>
+						<img
+							className="icon_cancel"
+							alt="cancel"
+							src={cancel_48}
+						></img>
+						CANCELAR
+					</button>
+				</div>
+				<div className="btns-edit-personal" style={styleBtnsEdit}>
+					<button
+						className="btn-confirm btns-action-efect"
+						onClick={ConfirmEdit}
+					>
+						<img
+							className="icon_check"
+							alt="check"
+							src={check_48}
+						></img>
+						ACEPTAR EDICION
+					</button>
+					<button
+						className="btn-cancel btns-action-efect"
+						onClick={hiddenBtnsAction}
+					>
 						<img
 							className="icon_cancel"
 							alt="cancel"

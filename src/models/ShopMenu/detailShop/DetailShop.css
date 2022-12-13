@@ -1,0 +1,42 @@
+.textarea-shop {
+	display: grid;
+}
+
+.content-detail-item {
+	background: #d6d6d630;
+	backdrop-filter: blur(1px);
+	border-radius: 15px;
+	padding: 15px;
+}
+
+.content-detail-item h2 {
+	text-align: center;
+    margin: 0;
+    font-family: 'freedoka';
+    color: white;
+    text-shadow: 2px 3px 0px black;
+	border-bottom: dotted;
+}
+
+.shop-data-item {
+	margin-left: 15px;
+}
+
+.data-input-content label {
+	font-family: 'play-bold';
+    color: white;
+    font-size: initial;
+    margin-top: 10px;
+    width: 153px;
+    align-self: stretch;
+}
+
+
+select {
+	padding: 3px;
+	font-family: monospace;
+	font-size: 1rem;
+	border-radius: 8px;
+	border: none;
+}
+
