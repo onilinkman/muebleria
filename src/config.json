@@ -1,0 +1,5 @@
+{
+    "api_urls":{
+        "getRols":"http://192.168.56.1:8000/getRols"
+    }
+}
