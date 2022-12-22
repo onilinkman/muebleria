@@ -6,9 +6,15 @@ class TableLibrary extends React.Component {
 		this.maxRows =
 			this.props.maxRows === undefined ? 10 : this.props.maxRows;
 
-		this.numberOfObjects = this.countNumeberOfPages();
+		this.numberOfObjects =
+			this.props.numberOfObjects === undefined
+				? this.countNumeberOfPages()
+				: this.props.numberOfObjects;
 		this.pageActual = 1;
 		this.pointer = 1;
+		this.isDataReactive = this.props.isDataReactive;
+		this.onClickPaginator = this.props.onClickPaginator;
+		this.overwriteHeader = this.props.overwriteHeader?this.props.overwriteHeader:new Map(); //Esto es un mapa
 		this.idName =
 			this.props.idName === undefined
 				? 'tableDefault'
@@ -18,7 +24,12 @@ class TableLibrary extends React.Component {
 				? 'table table-striped table-bordered'
 				: this.props.className;
 
-		this.onClickTr = typeof(props.onClickTr)==='function' ? props.onClickTr:()=>{console.warn("need a function for onClickTr")};
+		this.onClickTr =
+			typeof props.onClickTr === 'function'
+				? props.onClickTr
+				: () => {
+						console.warn('need a function for onClickTr');
+				  };
 	}
 
 	CreateTable() {
@@ -28,13 +39,17 @@ class TableLibrary extends React.Component {
 				<table className={this.className} id={this.idName}>
 					<thead>
 						{this.CreateTableHeader(
-							this.limitedRows(this.props.data),
+							this.isDataReactive
+								? this.props.data
+								: this.limitedRows(this.props.data),
 							dataKeys
 						)}
 					</thead>
 					<tbody>
 						{this.CreateBody(
-							this.limitedRows(this.props.data),
+							this.isDataReactive
+								? this.props.data
+								: this.limitedRows(this.props.data),
 							dataKeys
 						)}
 					</tbody>
@@ -51,7 +66,13 @@ class TableLibrary extends React.Component {
 		if (typeof data === 'object') {
 			var newTh = dataKeys.map((key) => {
 				if (!this.props.skipHeader?.has(key)) {
-					return <th key={key}>{key}</th>;
+					return (
+						<th key={key}>
+							{this.overwriteHeader.has(key)
+								? this.overwriteHeader.get(key)
+								: key}
+						</th>
+					);
 				}
 			});
 			return (
@@ -82,6 +103,10 @@ class TableLibrary extends React.Component {
 		return Math.ceil(this.props.data.length / this.maxRows);
 	}
 
+	getNumberOfPages(numRows) {
+		return Math.ceil(numRows / this.maxRows);
+	}
+
 	limitedRows(data) {
 		var newData = [];
 		var start = this.pointer * this.maxRows - this.maxRows;
@@ -106,7 +131,12 @@ class TableLibrary extends React.Component {
 	CreateBody(data, dataKeys) {
 		var newTrs = data.map((obj, i) => {
 			return (
-				<tr key={i} onClick={() => {this.onClickTr(obj,i)}}>
+				<tr
+					key={i}
+					onClick={() => {
+						this.onClickTr(obj, i);
+					}}
+				>
 					{this.addRowExtraAction(
 						obj,
 						i,
@@ -154,6 +184,12 @@ class TableLibrary extends React.Component {
 
 	CreatePaginator(actualPage, totalPages) {
 		let onclick = () => {
+			if (this.onClickPaginator !== undefined) {
+				this.onClickPaginator(
+					this.maxRows,
+					(actualPage - 1) * this.maxRows
+				);
+			}
 			this.render();
 			this.setState({});
 			this.pointer = actualPage;
@@ -196,6 +232,11 @@ class TableLibrary extends React.Component {
 		return button;
 	}
 
+	resetActualPage() {
+		this.actualPage = 1;
+		this.pointer = 1;
+	}
+
 	render() {
 		return (
 			<div className={this.props.className + '-container'}>
@@ -203,7 +244,9 @@ class TableLibrary extends React.Component {
 				<div style={{ display: 'flex' }}>
 					{this.CreatePaginator(
 						this.pointer > 2 ? this.pointer - 2 : 1,
-						this.numberOfObjects
+						this.props.numberOfObjects === undefined
+							? this.countNumeberOfPages()
+							: this.props.numberOfObjects
 					)}
 				</div>
 			</div>

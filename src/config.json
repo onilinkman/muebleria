@@ -1,5 +1,30 @@
 {
+    "dir_urls":"http://192.168.0.123:8080",
     "api_urls":{
-        "getRols":"http://192.168.56.1:8000/getRols"
+        "getRols":"/getRols",
+        "getRolsData":"/getRolsData",
+        "addRol":"/addRol",
+        "deleteRol":"/deleteRol",
+        "addStore":"/addStore",
+        "getAllStore":"/getAllStore",
+        "getAllStoreAndMount":"/getAllStoreAndMount",
+        "addPersonal":"/addPersonal",
+        "getPersonalsMount":"/getPersonalsMount",
+        "getPersonals":"/getPersonals",
+        "putPersonalById":"/putPersonalById",
+        "putPersonalByIdWithoutImage":"/putPersonalByIdWithoutImage"
+    },
+    "static":{
+        "personal":"/static/personal/"
+    },
+    "headers_api":{
+		"Accept": "*/*",
+		"User-Agent": "Thunder Client (https://www.thunderclient.com)",
+		"Content-Type": "application/json"
+	},
+    "headers_img":{
+        "Accept": "*/*",
+		"User-Agent": "Thunder Client (https://www.thunderclient.com)",
+		"Content-Type": "image/*"
     }
 }

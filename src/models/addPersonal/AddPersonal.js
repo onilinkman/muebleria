@@ -1,51 +1,109 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import TableLibrary from '../../components/table/Table';
 import Panel from './panelRegPersonal/panel';
+import config from '../../config.json';
 
 import './AddPersonal.css';
 
-class AddPersonal extends React.Component {
-	render() {
-		var dataTable = [
-			{
-				Ci: 833756421,
-				'Apellidos y Nombres': 'MarbanCallisayaChristian',
-			},
-			{ Ci: 4564, 'Apellidos y Nombres': 'Ector' },
-			{ Ci: 42123, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 213, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 1345, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 4575, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 120, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 77897, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 45645, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 454654, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-			{ Ci: 1454654, 'Apellidos y Nombres': 'agidn ajjbdfoa  iclzicgud' },
-		];
+export default function AddPersonal(props) {
+	var refTable = useRef(null);
+	var refPanel = useRef(null);
 
-		var skipHeader = new Map();
+	var [dataTable, setDataTable] = useState([]);
+	var [dataNumberObjects, setDataNumberObjects] = useState(0);
 
-		return (
-			<div className="personal-body">
-				<Link className="btn-back" to="/">
-					<p>Atras</p>
-				</Link>
-				<div className='content-table-panel'>
-					<div className="table-personal">
-						<TableLibrary
-							data={dataTable}
-							skipHeader={skipHeader}
-							className="personal-table"
-							idName="personal-table"
-						/>
-					</div>
-					<Panel />
+	var skipHeader = new Map();
+	skipHeader.set('id_personal', 'id_personal');
+
+	const callDataMount = (mount, from) => {
+		fetch(config.dir_urls + config.api_urls.getPersonalsMount, {
+			headers: config.headers_api,
+			method: 'PUT',
+			body: JSON.stringify({
+				mount: mount,
+				from: from,
+			}),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				setDataTable(data.data);
+				setDataNumberObjects(
+					refTable.current.getNumberOfPages(data.data[0].mount)
+				);
+				refTable.current.resetActualPage();
+			})
+			.catch((err) => {
+				console.log(err);
+				alert('no se pudo obtener los datos');
+			});
+	};
+
+	const callData = (mount, from) => {
+		fetch(config.dir_urls + config.api_urls.getPersonals, {
+			headers: config.headers_api,
+			method: 'PUT',
+			body: JSON.stringify({
+				mount: mount,
+				from: from,
+			}),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				setDataTable(data.data);
+			})
+			.catch((err) => {
+				console.log(err);
+				alert('no se pudo obtener los datos');
+			});
+	};
+
+	useEffect(() => {
+		callDataMount(10, 0);
+	}, []);
+
+	return (
+		<div className=".flex-column">
+			<Link className="btn-back" to="/">
+				<p>Atras</p>
+			</Link>
+			<div className="flex-space-around-100">
+				<Panel
+					ref={refPanel}
+					onPostData={() => {
+						callDataMount(10, 0);
+					}}
+				/>
+				<div className="table-content">
+					<TableLibrary
+						data={dataTable}
+						skipHeader={skipHeader}
+						className="library-table"
+						idName="personal-table"
+						maxRow={10}
+						ref={refTable}
+						isDataReactive={true}
+						numberOfObjects={dataNumberObjects}
+						overwriteHeader={skipHeader}
+						onClickPaginator={(mount, from) => {
+							callData(mount, from);
+						}}
+						onClickTr={(obj, i) => {
+							refPanel.current.setInputs(
+								obj.name,
+								obj.lastname,
+								obj.ci,
+								obj.date,
+								config.dir_urls +
+									config.static.personal +
+									obj.url_image,
+								obj
+							);
+						}}
+					/>
 				</div>
 			</div>
-		);
-	}
+		</div>
+	);
 }
-
-export default AddPersonal;

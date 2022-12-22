@@ -14,6 +14,7 @@ export default function ButtonAction(props) {
 		'btn-damage',
 		'btn-dmg-toon',
 		'btn-action-toon',
+		'btn-dmg-table'
 	];
 	return (
 		<button className={styles[props.styleNro]} onClick={props.onClick}>

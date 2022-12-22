@@ -12,6 +12,10 @@ const BtnImg = forwardRef((props, ref) => {
 	const INPUT_TYPE = 'file';
 	const INPUT_ACCEPT = 'image/*;capture=camera';
 
+	const imgPreview = useRef(null);
+	const refInputImg=useRef(null)
+
+
 	const onSelectImg = (e) => {
 		file = e.target.files[0];
 		if (file) {
@@ -23,16 +27,28 @@ const BtnImg = forwardRef((props, ref) => {
 		}
 		e.target.value = ''; // con esto aseguramos que cuando se cargue la misma imagen vuelva a disparar onChange
 	};
-	const imgPreview = useRef(null);
 	const selectImage = () => {
-		document.getElementById(INPUT_ID).click();
+		refInputImg.current.click();
 	};
+	
 	useImperativeHandle(ref, () => ({
 		RestaurePhoto() {
 			imgPreview.current.src = add_photo;
 			imgPreview.current.value = '';
 			file = null;
 		},
+		GetByteImage() {
+			
+			return imgPreview.current.src;
+		},
+		SetSrc(src){
+			imgPreview.current.src=src
+		},
+		isSrcBase64Image() {
+			
+			const regex = /^data:image\//;
+			return regex.test(imgPreview.current.src);
+		  }
 	}));
 	return (
 		<React.Fragment>
@@ -40,11 +56,13 @@ const BtnImg = forwardRef((props, ref) => {
 				<img
 					value={VALUE}
 					src={add_photo}
+					alt={"sin imagen"}
 					id={IMG_ID}
 					ref={imgPreview}
 				></img>
 			</div>
 			<input
+				ref={refInputImg}
 				id={INPUT_ID}
 				type={INPUT_TYPE}
 				accept={INPUT_ACCEPT}

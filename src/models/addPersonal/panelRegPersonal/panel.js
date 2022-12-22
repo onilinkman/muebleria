@@ -1,15 +1,16 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, useState } from 'react';
 
 import ComboBox from '../../../components/ComboBox/ComboBox';
 import BtnImg from '../../../components/BtnImg/BtnImg';
-
 
 import person_add from '../../../assets/icons/person_add_black_24dp.svg';
 import edit_48 from '../../../assets/icons/edit_48.svg';
 import check_48 from '../../../assets/icons/check_48.svg';
 import cancel_48 from '../../../assets/icons/cancel_48.svg';
 
-export default function Panel(props) {
+import config from '../../../config.json';
+
+function Panel(props, ref) {
 	const [isDisabled, setIsDisabled] = useState(true);
 	const [styleBtnsOptions, setStyleBtnsOptions] = useState({
 		display: 'flex',
@@ -21,16 +22,17 @@ export default function Panel(props) {
 		display: 'none',
 	});
 
+	var [objSelectedInTable,setObjSelectedInTable]=useState(null);
+
 	//Buttons ref
 	const inputName = useRef(null);
-	const inputFirstName = useRef(null);
+	const inputLastName = useRef(null);
 	const inputCi = useRef(null);
+	const refInputDate = useRef(null);
 
-	
 	const btnsOptions = useRef(null);
 	const actionRegister = useRef(null);
-	const btnImage=useRef(null)
-	
+	const btnImage = useRef(null);
 
 	const enableInputs = () => {
 		setIsDisabled(false);
@@ -40,7 +42,7 @@ export default function Panel(props) {
 
 	const clearInputs = () => {
 		inputName.current.value = '';
-		inputFirstName.current.value = '';
+		inputLastName.current.value = '';
 		inputCi.current.value = '';
 		btnImage.current.RestaurePhoto();
 	};
@@ -57,7 +59,6 @@ export default function Panel(props) {
 		setIsDisabled(false);
 		setStyleBtnsOptions({ display: 'none' });
 		setStyleBtnsEdit({ display: 'flex' });
-		clearInputs();
 	};
 
 	const ConfirmEdit = () => {
@@ -67,6 +68,92 @@ export default function Panel(props) {
 		clearInputs();
 	};
 
+	const SendDataPost = () => {
+		fetch(config.dir_urls + config.api_urls.addPersonal, {
+			headers: config.headers_api,
+			method: 'POST',
+			body: JSON.stringify({
+				name: inputName.current.value.trim(),
+				lastname: inputLastName.current.value.trim(),
+				ci: inputCi.current.value.trim(),
+				url_image: btnImage.current.GetByteImage(),
+				date: refInputDate.current.value,
+			}),
+		})
+			.then((response) => {
+				console.log('Se registro correctamente');
+				hiddenBtnsAction();
+				props.onPostData();
+			})
+			.catch((err) => {
+				console.log(err);
+				alert('Error al registrar');
+			});
+	};
+
+	const getTodayDate = () => {
+		refInputDate.current.valueAsDate = new Date();
+	};
+
+	useEffect(() => {
+		getTodayDate();
+	}, []);
+
+	const setInputs = (name, lastname, ci, date, url_image, obj) => {
+		inputName.current.value = name;
+		inputLastName.current.value = lastname;
+		inputCi.current.value = ci;
+		refInputDate.current.valueAsDate = new Date(date);
+		btnImage.current.SetSrc(url_image);
+		setObjSelectedInTable(obj)
+	};
+
+	useImperativeHandle(ref, () => ({
+		setInputs,
+	}));
+
+	const putPersonal = () => {
+		fetch(config.dir_urls + config.api_urls.putPersonalById, {
+			headers: config.headers_api,
+			method: 'PUT',
+			body: JSON.stringify({
+				id_personal: objSelectedInTable.id_personal,
+				name: inputName.current.value.trim(),
+				lastname: inputLastName.current.value.trim(),
+				ci: inputCi.current.value.trim(),
+				url_image: btnImage.current.GetByteImage(),
+				date: refInputDate.current.value,
+			}),
+		})
+			.then((response) => {
+				ConfirmEdit();
+			})
+			.catch((err) => {
+				console.log(err);
+				alert('no se puso guardar los cambios');
+			});
+	};
+
+	const putPersonalWithoutImg = () => {
+		fetch(config.dir_urls + config.api_urls.putPersonalByIdWithoutImage, {
+			headers: config.headers_api,
+			method: 'PUT',
+			body: JSON.stringify({
+				id_personal: objSelectedInTable.id_personal,
+				name: inputName.current.value.trim(),
+				lastname: inputLastName.current.value.trim(),
+				ci: inputCi.current.value.trim(),
+				date: refInputDate.current.value,
+			}),
+		})
+			.then((response) => {
+				ConfirmEdit();
+			})
+			.catch((err) => {
+				console.log(err);
+				alert('no se puso guardar los cambios');
+			});
+	};
 
 	return (
 		<div className="body-panel">
@@ -89,7 +176,7 @@ export default function Panel(props) {
 							type="text"
 							id="firstname-panel"
 							placeholder="Ingrese Apellido Paterno y Materno"
-							ref={inputFirstName}
+							ref={inputLastName}
 							disabled={isDisabled}
 							autoComplete="off"
 						/>
@@ -108,6 +195,7 @@ export default function Panel(props) {
 					<div className="panel-input">
 						<label htmlFor="date-panel">Fecha de Ingreso:</label>
 						<input
+							ref={refInputDate}
 							type="date"
 							id="date-panel"
 							disabled={isDisabled}
@@ -122,8 +210,7 @@ export default function Panel(props) {
 						/>
 					</div>
 				</div>
-				<BtnImg ref={btnImage}/>
-				
+				<BtnImg ref={btnImage} />
 			</div>
 			<div className="btn-panel">
 				<div
@@ -144,7 +231,10 @@ export default function Panel(props) {
 					</button>
 					<button
 						className="edit-personal btns-action-efect"
-						onClick={enableEdit}
+						onClick={() => {
+							console.log(btnImage.current.isSrcBase64Image());
+							enableEdit();
+						}}
 					>
 						<img
 							className="icon_personal"
@@ -161,7 +251,7 @@ export default function Panel(props) {
 				>
 					<button
 						className="btn-confirm btns-action-efect"
-						onClick={hiddenBtnsAction}
+						onClick={SendDataPost}
 					>
 						<img
 							className="icon_check"
@@ -185,7 +275,13 @@ export default function Panel(props) {
 				<div className="btns-edit-personal" style={styleBtnsEdit}>
 					<button
 						className="btn-confirm btns-action-efect"
-						onClick={ConfirmEdit}
+						onClick={() => {
+							if (btnImage.current.isSrcBase64Image()) {
+								putPersonal();
+							}else{
+								putPersonalWithoutImg();
+							}
+						}}
 					>
 						<img
 							className="icon_check"
@@ -210,3 +306,5 @@ export default function Panel(props) {
 		</div>
 	);
 }
+
+export default React.forwardRef(Panel);

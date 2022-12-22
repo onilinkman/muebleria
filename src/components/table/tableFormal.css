@@ -2,6 +2,7 @@
 	display: flex;
 	justify-content: center;
 	padding: 15px;
+    overflow-x: auto;
 }
 
 .library-table-container{
@@ -13,9 +14,7 @@
 	font-family: monospace;
 	font-style: revert;
 	font-size: 1.2em;
-	border: 2px solid grey;
-	/* height: 100%; */
-	/* margin-left: 15px; */
+    border: 2px solid #05050573;
 	border-collapse: collapse;
 	background: #ffffffb0;
 	color: #020202;
@@ -24,16 +23,37 @@
 
 
 .library-table thead {
-	background: linear-gradient(red, #ff000033);
+    background: #ff0000cf;
+
+}
+
+.library-table thead tr th {
+    color: white;
+    font-family: 'play-bold';
+    text-shadow: 2px 2px 0 black;
+    padding: 6px;
+    border-left: solid;
+    border-right: solid;
+    border-width: 2px;
+    border-color: grey;
+    border-style: dashed;
 }
 
 .library-table tbody tr {
     min-height: 40px;
+    
     border-bottom: solid;
-    border-width: 0px;
-    border-color: #0000005c;
-    border-style: dashed;
+	border-width: 2px;
+	border-color: #0000005c;
+	border-style: dashed;
     cursor: pointer;
+
+    /* height: 40px;
+	min-height: 40px;
+	border-bottom: solid;
+	border-width: 2px;
+	border-color: #0000005c;
+	border-style: dashed; */
 }
 
 .library-table tbody tr:hover {
@@ -45,9 +65,28 @@
 }
 
 .library-table tbody tr td {
-    border-left: solid;
-    border-width: 2px;
-    border-color: #0000005c;
-    border-style: inset;
-    overflow-x: auto;
+    max-width: 100px;
+	border-left: solid;
+	border-width: 2px;
+	border-color: #0000005c;
+	border-style: dashed;
+	overflow-x: auto;
+}
+
+.library-table-container div button{
+    padding: 4px;
+    border-radius: 7px;
+    border: none;
+    font-family: 'freedoka';
+    font-size: medium;
+    text-shadow: 0px 2px 2px white;
+    color: black;
+    cursor: pointer;
+    box-shadow: 2px 1px 3px 0px #292929;
+    gap: 3px;
+    margin: 2px;
+}
+
+.library-table-container div button:active{
+    box-shadow: inset 2px 1px 3px 0px #292929;
 }
